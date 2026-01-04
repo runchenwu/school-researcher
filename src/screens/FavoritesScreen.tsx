@@ -8,14 +8,14 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Share2, Trash2, Heart, X } from 'lucide-react-native';
+import { Share2, Trash2, Heart } from 'lucide-react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '../hooks/useTheme';
-import { SchoolCard, Button, EmptyState } from '../components';
+import { SchoolCard, EmptyState } from '../components';
 import { useFavoritesStore } from '../store';
 import { exportService } from '../services';
 import { RootStackParamList, FavoriteSchool } from '../types';
-import { spacing, typography, borderRadius, colors } from '../constants/theme';
+import { spacing, typography } from '../constants/theme';
 
 type FavoritesScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList>;
@@ -23,19 +23,8 @@ type FavoritesScreenProps = {
 
 export function FavoritesScreen({ navigation }: FavoritesScreenProps) {
   const { theme } = useTheme();
-  const { favorites, clearAll, removeFavorite } = useFavoritesStore();
+  const { favorites, clearAll } = useFavoritesStore();
   const [exporting, setExporting] = useState(false);
-
-  const confirmRemoveFavorite = (schoolId: string, schoolName: string) => {
-    Alert.alert(
-      'Remove from Favorites',
-      `Are you sure you want to remove ${schoolName} from your favorites?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Remove', style: 'destructive', onPress: () => removeFavorite(schoolId) },
-      ]
-    );
-  };
 
   const handleExport = async (format: 'csv' | 'json') => {
     if (favorites.length === 0) {
@@ -77,24 +66,15 @@ export function FavoritesScreen({ navigation }: FavoritesScreenProps) {
   };
 
   const renderItem = ({ item }: { item: FavoriteSchool }) => (
-    <View style={styles.favoriteItem}>
-      <SchoolCard
-        school={item.school}
-        onPress={() =>
-          navigation.navigate('SchoolDetail', {
-            schoolId: item.schoolId,
-            school: item.school,
-          })
-        }
-      />
-      <TouchableOpacity
-        style={[styles.deleteButton, { backgroundColor: colors.error }]}
-        onPress={() => confirmRemoveFavorite(item.schoolId, item.school.name)}
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-      >
-        <X size={16} color="#fff" />
-      </TouchableOpacity>
-    </View>
+    <SchoolCard
+      school={item.school}
+      onPress={() =>
+        navigation.navigate('SchoolDetail', {
+          schoolId: item.schoolId,
+          school: item.school,
+        })
+      }
+    />
   );
 
   return (
@@ -177,26 +157,6 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
     paddingBottom: spacing.xxl,
-  },
-  favoriteItem: {
-    position: 'relative',
-  },
-  deleteButton: {
-    position: 'absolute',
-    top: -6,
-    left: -6,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 3,
   },
 });

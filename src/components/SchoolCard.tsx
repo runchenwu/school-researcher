@@ -1,16 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
+  Image,
 } from 'react-native';
-import { Heart, MapPin, Building2, Home, TreePine, Trophy } from 'lucide-react-native';
+import { Heart, MapPin, Building2, Home, TreePine, Trophy, GraduationCap } from 'lucide-react-native';
 import { useTheme } from '../hooks/useTheme';
 import { Card } from './Card';
 import { School } from '../types';
 import { useFavoritesStore } from '../store';
 import { spacing, typography, borderRadius, colors } from '../constants/theme';
+
+// Helper to get logo URL from school website
+function getLogoUrl(website?: string): string | null {
+  if (!website) return null;
+  try {
+    // Clean up the URL
+    let cleanUrl = website.trim();
+    if (!cleanUrl.startsWith('http')) {
+      cleanUrl = `https://${cleanUrl}`;
+    }
+    const url = new URL(cleanUrl);
+    // Extract the domain (e.g., berkeley.edu from www.berkeley.edu)
+    const domain = url.hostname.replace(/^www\./, '');
+    // Use Google's favicon service (more reliable, supports more domains)
+    return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+  } catch {
+    return null;
+  }
+}
 
 interface SchoolCardProps {
   school: School;
@@ -21,6 +41,7 @@ export function SchoolCard({ school, onPress }: SchoolCardProps) {
   const { theme } = useTheme();
   const { isFavorite, addFavorite, removeFavorite } = useFavoritesStore();
   const isFav = isFavorite(school.id);
+  const [logoError, setLogoError] = useState(false);
 
   const toggleFavorite = () => {
     if (isFav) {
@@ -52,6 +73,9 @@ export function SchoolCard({ school, onPress }: SchoolCardProps) {
   
   // Get the primary ranking to display
   const primaryRank = rankings.overall || rankings.nationalUniversity || rankings.liberalArts;
+  
+  // Get logo URL
+  const logoUrl = getLogoUrl(school.website);
 
   const SettingIcon = {
     urban: Building2,
@@ -63,16 +87,48 @@ export function SchoolCard({ school, onPress }: SchoolCardProps) {
     <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
       <Card variant="elevated" style={styles.card}>
         <View style={styles.header}>
-          <View style={styles.titleRow}>
-            {primaryRank && (
-              <View style={[styles.rankBadge, { backgroundColor: colors.accent[500] }]}>
-                <Trophy size={12} color="#fff" />
-                <Text style={styles.rankText}>#{primaryRank}</Text>
+          <View style={styles.headerTop}>
+            {/* School Logo */}
+            <View style={[styles.logoContainer, { backgroundColor: theme.surfaceSecondary }]}>
+              {logoUrl && !logoError ? (
+                <Image
+                  source={{ uri: logoUrl }}
+                  style={styles.logo}
+                  onError={() => setLogoError(true)}
+                  resizeMode="contain"
+                />
+              ) : (
+                <GraduationCap size={24} color={theme.textMuted} />
+              )}
+            </View>
+            
+            <View style={styles.headerInfo}>
+              <View style={styles.titleRow}>
+                {primaryRank && (
+                  <View style={[styles.rankBadge, { backgroundColor: colors.accent[500] }]}>
+                    <Trophy size={10} color="#fff" />
+                    <Text style={styles.rankText}>#{primaryRank}</Text>
+                  </View>
+                )}
+                <Text style={[styles.name, { color: theme.text }]} numberOfLines={2}>
+                  {school.name || 'Unknown School'}
+                </Text>
               </View>
-            )}
-            <Text style={[styles.name, { color: theme.text }, primaryRank && styles.nameWithRank]} numberOfLines={1}>
-              {school.name || 'Unknown School'}
-            </Text>
+              <View style={styles.locationRow}>
+                <MapPin size={12} color={theme.textSecondary} />
+                <Text style={[styles.location, { color: theme.textSecondary }]}>
+                  {city}{state ? `, ${state}` : ''}
+                </Text>
+                <View style={[styles.settingBadge, { backgroundColor: theme.primaryLight }]}>
+                  <SettingIcon size={10} color={theme.primary} />
+                  <Text style={[styles.settingText, { color: theme.primary }]}>
+                    {setting}
+                  </Text>
+                </View>
+              </View>
+            </View>
+            
+            {/* Favorite Button */}
             <TouchableOpacity onPress={toggleFavorite} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
               <Heart
                 size={24}
@@ -80,18 +136,6 @@ export function SchoolCard({ school, onPress }: SchoolCardProps) {
                 fill={isFav ? colors.accent[500] : 'transparent'}
               />
             </TouchableOpacity>
-          </View>
-          <View style={styles.locationRow}>
-            <MapPin size={14} color={theme.textSecondary} />
-            <Text style={[styles.location, { color: theme.textSecondary }]}>
-              {city}{state ? `, ${state}` : ''}
-            </Text>
-            <View style={[styles.settingBadge, { backgroundColor: theme.primaryLight }]}>
-              <SettingIcon size={12} color={theme.primary} />
-              <Text style={[styles.settingText, { color: theme.primary }]}>
-                {setting}
-              </Text>
-            </View>
           </View>
         </View>
 
@@ -167,41 +211,59 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: spacing.md,
   },
+  headerTop: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+  },
+  logoContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: borderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  logo: {
+    width: 40,
+    height: 40,
+  },
+  headerInfo: {
+    flex: 1,
+  },
   titleRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: spacing.sm,
     marginBottom: spacing.xs,
+    flexWrap: 'wrap',
   },
   name: {
-    fontSize: typography.sizes.lg,
+    fontSize: typography.sizes.md,
     fontWeight: '700',
     flex: 1,
-    marginRight: spacing.sm,
-  },
-  nameWithRank: {
-    marginLeft: spacing.sm,
   },
   rankBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: 2,
     borderRadius: borderRadius.full,
-    gap: 4,
+    gap: 2,
   },
   rankText: {
     color: '#fff',
-    fontSize: typography.sizes.sm,
+    fontSize: typography.sizes.xs,
     fontWeight: '700',
   },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
+    flexWrap: 'wrap',
   },
   location: {
-    fontSize: typography.sizes.sm,
+    fontSize: typography.sizes.xs,
   },
   settingBadge: {
     flexDirection: 'row',

@@ -59,7 +59,8 @@ IMPORTANT: When you mention specific schools, you MUST include a JSON block at t
           { "name": "Computer Science", "rank": 5, "source": "US News 2024" },
           { "name": "Economics", "rank": 12, "source": "US News 2024" }
         ]
-      }
+      },
+      "website": "https://www.university.edu"
     }
   ]
 }
@@ -71,6 +72,7 @@ Notes for the JSON:
 - "acceptanceRate" should be a decimal (e.g., 0.15 for 15%)
 - "rankings.overall" is the overall national ranking (use nationalUniversity or liberalArts as appropriate)
 - "majorRankings" should include rankings for notable programs when available
+- "website" should be the school's official website URL
 - Include all schools mentioned in your response`;
 
 interface Message {
