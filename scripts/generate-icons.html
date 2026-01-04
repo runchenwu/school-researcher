@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School Researcher - App Icon Generator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1e293b;
+      color: #f1f5f9;
+      min-height: 100vh;
+      padding: 40px;
+    }
+    h1 { margin-bottom: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .icons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+      margin-top: 30px;
+    }
+    .icon-card {
+      background: #334155;
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+    }
+    .icon-card h3 { margin-bottom: 10px; font-size: 14px; }
+    .icon-card p { font-size: 12px; color: #94a3b8; margin-bottom: 15px; }
+    canvas { border-radius: 20%; background: #0c4a6e; }
+    button {
+      background: #0ea5e9;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 15px;
+    }
+    button:hover { background: #0284c7; }
+    .instructions {
+      background: #334155;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+    }
+    .instructions ol { margin-left: 20px; line-height: 1.8; }
+    .download-all {
+      background: #10b981;
+      font-size: 16px;
+      padding: 15px 30px;
+    }
+    .download-all:hover { background: #059669; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎓 School Researcher - App Icon Generator</h1>
+    
+    <div class="instructions">
+      <h3>Instructions:</h3>
+      <ol>
+        <li>Click "Download All Icons" or download individually</li>
+        <li>Move the downloaded files to your <code>assets/</code> folder</li>
+        <li>Replace existing icon.png, adaptive-icon.png, splash.png, and favicon.png</li>
+      </ol>
+      <br>
+      <button class="download-all" onclick="downloadAll()">Download All Icons</button>
+    </div>
+
+    <div class="icons-grid">
+      <div class="icon-card">
+        <h3>App Icon</h3>
+        <p>1024 x 1024</p>
+        <canvas id="icon" width="1024" height="1024"></canvas>
+        <br>
+        <button onclick="download('icon', 'icon.png')">Download</button>
+      </div>
+
+      <div class="icon-card">
+        <h3>Adaptive Icon</h3>
+        <p>1024 x 1024</p>
+        <canvas id="adaptive" width="1024" height="1024"></canvas>
+        <br>
+        <button onclick="download('adaptive', 'adaptive-icon.png')">Download</button>
+      </div>
+
+      <div class="icon-card">
+        <h3>Splash Screen</h3>
+        <p>1284 x 2778</p>
+        <canvas id="splash" width="1284" height="2778" style="max-height: 200px; width: auto;"></canvas>
+        <br>
+        <button onclick="download('splash', 'splash.png')">Download</button>
+      </div>
+
+      <div class="icon-card">
+        <h3>Favicon</h3>
+        <p>48 x 48</p>
+        <canvas id="favicon" width="48" height="48" style="width: 96px; height: 96px;"></canvas>
+        <br>
+        <button onclick="download('favicon', 'favicon.png')">Download</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const skyBlue = '#0ea5e9';
+    const darkBlue = '#0c4a6e';
+    const white = '#ffffff';
+
+    function drawGraduationCap(ctx, x, y, size) {
+      ctx.save();
+      ctx.translate(x, y);
+      
+      // Cap top (diamond shape)
+      ctx.fillStyle = white;
+      ctx.beginPath();
+      ctx.moveTo(0, -size * 0.3);
+      ctx.lineTo(size * 0.5, 0);
+      ctx.lineTo(0, size * 0.15);
+      ctx.lineTo(-size * 0.5, 0);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Cap base
+      ctx.fillStyle = white;
+      ctx.beginPath();
+      ctx.ellipse(0, size * 0.05, size * 0.35, size * 0.12, 0, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Tassel
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = size * 0.04;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(size * 0.25, size * 0.05);
+      ctx.lineTo(size * 0.35, size * 0.35);
+      ctx.stroke();
+      
+      // Tassel end
+      ctx.fillStyle = '#fbbf24';
+      ctx.beginPath();
+      ctx.arc(size * 0.35, size * 0.38, size * 0.06, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.restore();
+    }
+
+    function drawMagnifyingGlass(ctx, x, y, size) {
+      ctx.save();
+      ctx.translate(x, y);
+      
+      // Glass circle
+      ctx.strokeStyle = white;
+      ctx.lineWidth = size * 0.08;
+      ctx.beginPath();
+      ctx.arc(0, 0, size * 0.25, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      // Handle
+      ctx.strokeStyle = white;
+      ctx.lineWidth = size * 0.1;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(size * 0.18, size * 0.18);
+      ctx.lineTo(size * 0.35, size * 0.35);
+      ctx.stroke();
+      
+      ctx.restore();
+    }
+
+    function drawIcon(canvasId, size, isAdaptive = false) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      
+      // Background
+      if (isAdaptive) {
+        ctx.fillStyle = darkBlue;
+        ctx.fillRect(0, 0, size, size);
+      } else {
+        // Rounded corners for app icon
+        const radius = size * 0.22;
+        ctx.fillStyle = darkBlue;
+        ctx.beginPath();
+        ctx.roundRect(0, 0, size, size, radius);
+        ctx.fill();
+      }
+      
+      // Add gradient overlay
+      const gradient = ctx.createRadialGradient(size * 0.3, size * 0.3, 0, size * 0.5, size * 0.5, size * 0.7);
+      gradient.addColorStop(0, 'rgba(14, 165, 233, 0.3)');
+      gradient.addColorStop(1, 'rgba(14, 165, 233, 0)');
+      ctx.fillStyle = gradient;
+      if (isAdaptive) {
+        ctx.fillRect(0, 0, size, size);
+      } else {
+        ctx.beginPath();
+        ctx.roundRect(0, 0, size, size, size * 0.22);
+        ctx.fill();
+      }
+      
+      // Draw graduation cap
+      drawGraduationCap(ctx, size * 0.5, size * 0.38, size * 0.5);
+      
+      // Draw magnifying glass
+      drawMagnifyingGlass(ctx, size * 0.65, size * 0.65, size * 0.4);
+    }
+
+    function drawSplash(canvasId) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      
+      // Background
+      ctx.fillStyle = darkBlue;
+      ctx.fillRect(0, 0, w, h);
+      
+      // Gradient overlay
+      const gradient = ctx.createRadialGradient(w * 0.5, h * 0.4, 0, w * 0.5, h * 0.5, w);
+      gradient.addColorStop(0, 'rgba(14, 165, 233, 0.2)');
+      gradient.addColorStop(1, 'rgba(14, 165, 233, 0)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, w, h);
+      
+      // Draw icon in center
+      const iconSize = w * 0.4;
+      drawGraduationCap(ctx, w * 0.5, h * 0.4, iconSize);
+      drawMagnifyingGlass(ctx, w * 0.65, h * 0.48, iconSize * 0.7);
+      
+      // App name
+      ctx.fillStyle = white;
+      ctx.font = `bold ${w * 0.08}px -apple-system, BlinkMacSystemFont, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('School', w * 0.5, h * 0.6);
+      ctx.fillText('Researcher', w * 0.5, h * 0.68);
+    }
+
+    function drawFavicon(canvasId) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      const size = 48;
+      
+      // Background
+      ctx.fillStyle = darkBlue;
+      ctx.beginPath();
+      ctx.roundRect(0, 0, size, size, 8);
+      ctx.fill();
+      
+      // Simple cap shape
+      ctx.fillStyle = white;
+      ctx.beginPath();
+      ctx.moveTo(24, 10);
+      ctx.lineTo(42, 22);
+      ctx.lineTo(24, 30);
+      ctx.lineTo(6, 22);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Base
+      ctx.beginPath();
+      ctx.ellipse(24, 26, 14, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function download(canvasId, filename) {
+      const canvas = document.getElementById(canvasId);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function downloadAll() {
+      download('icon', 'icon.png');
+      setTimeout(() => download('adaptive', 'adaptive-icon.png'), 100);
+      setTimeout(() => download('splash', 'splash.png'), 200);
+      setTimeout(() => download('favicon', 'favicon.png'), 300);
+    }
+
+    // Generate all icons on load
+    window.onload = function() {
+      drawIcon('icon', 1024, false);
+      drawIcon('adaptive', 1024, true);
+      drawSplash('splash');
+      drawFavicon('favicon');
+    };
+  </script>
+</body>
+</html>
+

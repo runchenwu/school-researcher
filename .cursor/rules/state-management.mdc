@@ -1,0 +1,41 @@
+---
+description: Zustand state management patterns and conventions
+globs:
+  - src/store/**/*.ts
+alwaysApply: false
+---
+
+# State Management
+
+## Zustand Stores
+- Zustand stores in `src/store/`
+- Use `persist` middleware for data that should survive app restart
+- Export hooks: `export const useXxxStore = create<XxxState>()`
+
+## File Naming
+- Stores: camelCase with `Store` suffix (`settingsStore.ts`)
+
+## Store Pattern
+```typescript
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+interface ExampleState {
+  value: string;
+  setValue: (value: string) => void;
+}
+
+export const useExampleStore = create<ExampleState>()(
+  persist(
+    (set) => ({
+      value: '',
+      setValue: (value) => set({ value }),
+    }),
+    {
+      name: 'example-storage',
+      storage: createJSONStorage(() => AsyncStorage),
+    }
+  )
+);
+```

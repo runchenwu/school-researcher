@@ -1,0 +1,55 @@
+---
+description: React Native component conventions and patterns
+globs:
+  - src/components/**/*.tsx
+  - src/screens/**/*.tsx
+alwaysApply: false
+---
+
+# Component Conventions
+
+## Components
+- Use functional components with TypeScript
+- Export named functions, not default exports
+- Props interfaces defined above component
+- Use `useTheme()` hook for colors, never hardcode colors
+- Destructure theme: `const { theme } = useTheme();`
+
+## Styling
+- Always use `StyleSheet.create()` at bottom of file
+- Use spacing, typography, borderRadius from `constants/theme`
+- Apply theme colors via style arrays: `[styles.text, { color: theme.text }]`
+- Never use inline style objects for static styles
+
+## Icons
+- ONLY use `lucide-react-native` for icons
+- Import specific icons: `import { Heart, Search } from 'lucide-react-native'`
+- Never use emojis in the UI
+- Icon props: `size={number}` and `color={theme.xxx}`
+
+## File Naming
+- Components: PascalCase (`SchoolCard.tsx`)
+
+## Screen Component Pattern
+```typescript
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../hooks/useTheme';
+import { spacing, typography } from '../constants/theme';
+
+export function ExampleScreen() {
+  const { theme } = useTheme();
+  
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+      <Text style={[styles.title, { color: theme.text }]}>Title</Text>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  title: { fontSize: typography.sizes.xl, fontWeight: '700' },
+});
+```

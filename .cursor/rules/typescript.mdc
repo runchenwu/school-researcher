@@ -1,0 +1,42 @@
+---
+description: TypeScript conventions and type definitions
+globs:
+  - src/**/*.ts
+  - src/**/*.tsx
+alwaysApply: false
+---
+
+# TypeScript Conventions
+
+## Type Definitions
+- Define interfaces for all props and state
+- Use `type` for unions, `interface` for objects
+- Avoid `any` - use `unknown` if type is truly unknown
+- Import types from `src/types/index.ts`
+
+## File Naming
+- Hooks: camelCase with `use` prefix (`useTheme.ts`)
+
+## Examples
+
+### Props Interface
+```typescript
+interface SchoolCardProps {
+  school: School;
+  onPress: () => void;
+}
+```
+
+### Union Type
+```typescript
+type TabKey = 'overview' | 'admissions' | 'academics' | 'faculty';
+```
+
+### Generic State
+```typescript
+interface SearchState {
+  recentSearches: string[];
+  isLoading: boolean;
+  error: string | null;
+}
+```

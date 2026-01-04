@@ -1,0 +1,23 @@
+---
+description: Service layer patterns for API and external integrations
+globs:
+  - src/services/**/*.ts
+alwaysApply: false
+---
+
+# Services
+
+## AI Service
+- Located in `src/services/aiService.ts`
+- Supports OpenAI, Gemini, and Anthropic
+- Returns `ResearchResponse` with content and optional schools array
+- School data is extracted from JSON blocks in AI responses
+
+## File Naming
+- Services: camelCase with `Service` suffix (`aiService.ts`)
+
+## Service Pattern
+- Export singleton instance: `export const aiService = new AIService()`
+- Use async/await for all API calls
+- Handle errors gracefully with try/catch
+- Return typed responses

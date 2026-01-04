@@ -133,33 +133,35 @@ export function SchoolDetailScreen({ route, navigation }: Props) {
       </View>
 
       {/* Tabs */}
-      <View style={[styles.tabs, { borderBottomColor: theme.border }]}>
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        style={[styles.tabsContainer, { borderBottomColor: theme.border }]}
+        contentContainerStyle={styles.tabsContent}
+      >
         {tabs.map((tab) => {
           const TabIcon = tab.icon;
+          const isActive = activeTab === tab.key;
           return (
             <TouchableOpacity
               key={tab.key}
               style={[
                 styles.tab,
-                activeTab === tab.key && {
-                  borderBottomColor: theme.primary,
-                  borderBottomWidth: 2,
-                },
+                isActive && styles.tabActive,
+                isActive && { borderBottomColor: theme.primary },
               ]}
               onPress={() => {
                 setActiveTab(tab.key);
               }}
             >
               <TabIcon
-                size={18}
-                color={activeTab === tab.key ? theme.primary : theme.textMuted}
+                size={16}
+                color={isActive ? theme.primary : theme.textMuted}
               />
               <Text
                 style={[
                   styles.tabLabel,
-                  {
-                    color: activeTab === tab.key ? theme.primary : theme.textMuted,
-                  },
+                  { color: isActive ? theme.primary : theme.textMuted },
                 ]}
               >
                 {tab.label}
@@ -167,7 +169,7 @@ export function SchoolDetailScreen({ route, navigation }: Props) {
             </TouchableOpacity>
           );
         })}
-      </View>
+      </ScrollView>
 
       <ScrollView
         style={styles.content}
@@ -543,21 +545,28 @@ const styles = StyleSheet.create({
   favoriteButton: {
     marginLeft: spacing.md,
   },
-  tabs: {
-    flexDirection: 'row',
+  tabsContainer: {
     borderBottomWidth: 1,
-    marginHorizontal: spacing.lg,
+    flexGrow: 0,
+  },
+  tabsContent: {
+    paddingHorizontal: spacing.md,
+    gap: spacing.xs,
   },
   tab: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     paddingVertical: spacing.sm,
-    gap: 4,
+    paddingHorizontal: spacing.md,
+    gap: spacing.xs,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  tabActive: {
+    borderBottomWidth: 2,
   },
   tabLabel: {
-    fontSize: typography.sizes.xs,
+    fontSize: typography.sizes.sm,
     fontWeight: '600',
   },
   content: {
